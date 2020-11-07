@@ -38,17 +38,15 @@ p.s. Отчет и исходный код .zip (или ссылку на github) также высылать на isu.ifmo
 
 """
 
-import http.server
-import socketserver
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import sys
 import requests
 import random
 from lxml import html
 import json
-import os
 
 IP = "127.0.0.1"
 PORT = 8080
-Handler = http.server.SimpleHTTPRequestHandler
 
 NAMES = []
 
@@ -58,57 +56,65 @@ def init_names() -> bool:
     try:
         file = open("names.txt", 'r')
         for name in file:
-            NAMES.append(name)
+            NAMES.append(name.replace("\n", ""))
         file.close()
+        print(NAMES)
         return True
     except IOError as io:
         print(f'error during names reading: {io}')
         return False
 
 
-def google_search(name: str) -> json:
-    r = requests.get(f'https://www.google.com/search?tbm=isch&q={name}')
-    if r.status_code == 200:
-        file_name = 'result.html'
-        file = open(file_name, 'w+')
-        file.write(r.text)
-        file.close()
-        # todo: process the errors (html error, parse error)
+def get_four_names() -> []:
+    arr = []
+    i = 1
+    while i < 5:
+        next_name = random.choice(NAMES)
+        if next_name not in arr:
+            arr.append(next_name)
+            i += 1
+    return arr
 
+
+def google_search() -> {}:
+    names_arr = get_four_names()
+    # todo: add parameter - search only face
+    r = requests.get(f'https://www.google.com/search?tbm=isch&q={names_arr[0]}')
+    if r.status_code == 200:
         urls = []
-        # :( lxml can't https://
-        root = html.parse(file_name).getroot()
+        root = html.fromstring(r.text)
         for url in root.xpath('//img[@src]')[1:]:
             urls.append(url.attrib['src'])
-
-        os.remove(file_name)
-        return json.dumps({'status': r.status_code, 'text': random.choice(urls)})
+        return {'status': r.status_code, 'url': random.choice(urls), 'names': [names_arr], 'text': 'success'}
     else:
-        return json.dumps({'status': r.status_code, 'text': r.text})
+        return {'status': r.status_code, 'url': None, 'names': None, 'text': r.text}
+
+
+class Server(BaseHTTPRequestHandler):
+    def _set_headers(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'application/json')
+        self.end_headers()
+
+    def do_GET(self):
+        self._set_headers()
+        r = google_search()
+        json_string = json.dumps(
+            {'status': r.get('status'), 'text': r.get('text'), 'names': r.get('names'), 'url': r.get('url')})
+        self.wfile.write(json_string.encode())
+
+
+def run(server_class=HTTPServer, handler_class=Server):
+    server_address = (IP, PORT)
+    httpd = server_class(server_address, handler_class)
+
+    print(f'server is up: see http://localhost:8080/')
+    httpd.serve_forever()
 
 
 if __name__ == '__main__':
-    init_names()
-    res = google_search(random.choice(NAMES))
-    print(res)
-
-# with socketserver.TCPServer(("", PORT), Handler) as httpd:
-#     if init_names():
-#         print(f'server is up: see http://localhost:8080/')
-#         httpd.serve_forever()
-#     else:
-#         sys.exit(-1)
-
-"""
-WHAT WE SHOULD DO? 
-
-- user -> btn "start"
-- server: get(/play) -> random name -> google(find images by name) -> RETURN??? (maybe links...) -> get 30, choose 1
-- user: get 1 photo and 4 names (and 1 is correct), user play.
-
-so only 1 request 
-
-https://www.google.com/search?tbm=isch&q=findSomeImage -> result is html file, parse to get all <img SRC attr. 
-
-I WANT BOOTSTRAP! to upgrade css 
-"""
+    if init_names():
+        run()
+    else:
+        print('Error during reading names')
+        sys.exit(-1)
