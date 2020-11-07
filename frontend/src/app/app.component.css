@@ -1,0 +1,38 @@
+:host {
+  background-image: url("https://i.ebayimg.com/images/g/QYAAAOSw7IpdJR0s/s-l300.jpg");
+}
+
+#header {
+  padding-top: 10px;
+  text-align: center;
+  font-family: "Comic Sans MS", cursive;
+  font-size: 40px;
+  display: block;
+}
+
+#content-area {
+  padding-top: 10%;
+  display: flex;
+  justify-content: center;
+}
+
+#before-start, #game {
+  width: 310px;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.images {
+  margin: 5px;
+  width: 300px;
+  height: 300px;
+  border-radius: 10%;
+}
+
+#spinner {
+  position: fixed;
+  top: 45%;
+  left: 45%;
+  z-index: 100000;
+}

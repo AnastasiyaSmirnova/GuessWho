@@ -85,15 +85,19 @@ def google_search() -> {}:
         root = html.fromstring(r.text)
         for url in root.xpath('//img[@src]')[1:]:
             urls.append(url.attrib['src'])
-        return {'status': r.status_code, 'url': random.choice(urls), 'names': [names_arr], 'text': 'success'}
+        correct_name = names_arr[0]
+        random.choice(names_arr)
+        return {'status': r.status_code, 'url': random.choice(urls), 'correctName': correct_name,
+                'names': names_arr, 'text': 'success'}
     else:
-        return {'status': r.status_code, 'url': None, 'names': None, 'text': r.text}
+        return {'status': r.status_code, 'url': None, 'names': None, 'correctName': None, 'text': r.text}
 
 
 class Server(BaseHTTPRequestHandler):
     def _set_headers(self):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
 
     def do_GET(self):
