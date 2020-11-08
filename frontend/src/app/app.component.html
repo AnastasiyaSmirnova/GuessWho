@@ -3,27 +3,29 @@
 <div id="content-area">
   <div id="before-start" *ngIf="!round">
     <img class="images" [src]="questionMarkURL" alt="Click and play!">
-    <button class="btn btn-primary" style="display: flex"
-            (click)="play()">{{isFirstTime ? 'Play!' : 'Play again!'}}</button>
+    <button class="btn btn-primary" style="display: flex" (click)="play()">Play!</button>
   </div>
 
   <div id="game" *ngIf="round">
-    <img class="images" [src]="round.url" alt="sorry, image is broken :(">
+    <img [src]="round.url" alt="sorry, image is broken :(">
 
-    <clr-button-group [clrMenuPosition]="'bottom-right'">
-      <clr-button class="btn" [style]="{'background': answer? getBackgroundColor(name):undefined}"
-                  *ngFor="let name of round.names" (click)="setCurrentAnswer(name)">
+    <div class="btn-group">
+      <button class="btn" [style]="{'background-color': answer? getBackgroundColor(name):'white'}"
+              *ngFor="let name of round.names" (click)="setCurrentAnswer(name)">
         <clr-icon *ngIf="!answer && currentAnswer == name" shape="check"></clr-icon>
         <clr-icon *ngIf="name == round.correctName && answer" shape="success-standard"></clr-icon>
         <clr-icon *ngIf="name != round.correctName && answer" shape="times"></clr-icon>
         {{name}}
-      </clr-button>
-    </clr-button-group>
+      </button>
+    </div>
 
-    <button *ngIf="!answer" class="btn btn-info" (click)="showAnswer()">see answer</button>
-    <clr-icon *ngIf="answer && currentAnswer == round.correctName" shape="happy-face"></clr-icon>
-    <clr-icon *ngIf="answer && currentAnswer != round.correctName" shape="sad-face"></clr-icon>
-    <button *ngIf="!answer" class="btn btn-primary">Check!</button>
+    <div id="result" *ngIf="answer">
+      <clr-icon *ngIf="currentAnswer == round.correctName" shape="happy-face" size="48"></clr-icon>
+      <clr-icon *ngIf="currentAnswer != round.correctName" shape="sad-face" size="48"></clr-icon>
+    </div>
+    <button *ngIf="!answer" class="btn btn-primary" (click)="answer=true">Check!</button>
+
+    <button class="btn btn-primary" style="display: flex" (click)="play()">Play again!</button>
   </div>
 </div>
 <clr-spinner id="spinner" *ngIf="loading"></clr-spinner>

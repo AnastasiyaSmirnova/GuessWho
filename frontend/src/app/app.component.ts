@@ -10,7 +10,6 @@ import { Response } from './model/Responce';
 export class AppComponent {
   title = 'Guess who???';
 
-  isFirstTime = true;
   loading = false;
   round: Response = null;
   answer = false;
@@ -25,33 +24,24 @@ export class AppComponent {
     this.loading = true;
     this.service.getData().subscribe(
       data => {
-        this.round = data;
-        this.isFirstTime = false;
         this.loading = false;
-        console.log(data);
+        this.answer = false;
+        this.round = data;
+        this.currentAnswer = undefined;
+        console.log(this.round);
       },
       error => {
-        console.log(error);
         this.loading = false;
+        console.log(error);
       }
     );
   }
 
-  showAnswer(): void {
-    this.answer = !this.answer;
-  }
-
   getBackgroundColor(name: string): string {
-    return name === this.round.correctName ? '#3D9970' : '#FF4136';
+    return name === this.round.correctName ? '#8FBC8F' : '#F08080';
   }
 
   setCurrentAnswer(name: string): void {
     this.currentAnswer = name;
   }
-
-  /**
-   * todo()
-   * play again()
-   * check answers doesn't work!
-   */
 }
