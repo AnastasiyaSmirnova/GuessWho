@@ -79,14 +79,14 @@ def get_four_names() -> []:
 def google_search() -> {}:
     names_arr = get_four_names()
     # todo: add parameter - search only face
-    r = requests.get(f'https://www.google.com/search?tbm=isch&q={names_arr[0]}')
+    r = requests.get(f'https://www.google.com/search?tbm=isch&q={names_arr[0]} face')
     if r.status_code == 200:
         urls = []
         root = html.fromstring(r.text)
         for url in root.xpath('//img[@src]')[1:]:
             urls.append(url.attrib['src'])
         correct_name = names_arr[0]
-        random.choice(names_arr)
+        random.shuffle(names_arr)
         return {'status': r.status_code, 'url': random.choice(urls), 'correctName': correct_name,
                 'names': names_arr, 'text': 'success'}
     else:
@@ -104,7 +104,8 @@ class Server(BaseHTTPRequestHandler):
         self._set_headers()
         r = google_search()
         json_string = json.dumps(
-            {'status': r.get('status'), 'text': r.get('text'), 'names': r.get('names'), 'url': r.get('url')})
+            {'status': r.get('status'), 'text': r.get('text'), 'names': r.get('names'),
+             'url': r.get('url'), 'correctName': r.get('correctName')})
         self.wfile.write(json_string.encode())
 
 
