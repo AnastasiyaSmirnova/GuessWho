@@ -3,6 +3,11 @@
 <div id="content-area">
   <div id="before-start" *ngIf="!round">
     <img class="images" [src]="questionMarkURL" alt="Click and play!">
+    <clclr-select-containert>
+      <select class="select-level" clrSelect [(ngModel)]="level">
+        <option *ngFor="let n of levels" [ngValue]="n">{{n}}</option>
+      </select>
+    </clclr-select-containert>
     <button class="btn btn-primary" style="display: flex" (click)="play()">Play!</button>
   </div>
 
@@ -26,6 +31,11 @@
     <button *ngIf="!answer" class="btn btn-primary" (click)="answer=true">Check!</button>
 
     <button class="btn btn-primary" style="display: flex" (click)="play()">Play again!</button>
+    <clclr-select-containert>
+      <select class="select-level" clrSelect [(ngModel)]="level">
+        <option *ngFor="let n of levels" [ngValue]="n">{{n}}</option>
+      </select>
+    </clclr-select-containert>
   </div>
 </div>
 <clr-spinner id="spinner" *ngIf="loading"></clr-spinner>

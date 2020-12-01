@@ -11,11 +11,11 @@ export class GuessWhoService {
   constructor(private http: HttpClient) {
   }
 
-  getData(): Observable<Response> {
+  getData(level: number): Observable<Response> {
     const headers = new HttpHeaders();
     headers.set('Access-Control-Request-Headers', 'Content-Type');
     headers.set('Access-Control-Allow-Origin', '*');
     headers.set('Access-Control-Request-Method', 'GET');
-    return this.http.get<Response>('http://localhost:8080/', {headers});
+    return this.http.get<Response>(`http://localhost:8080?level=${level}`, {headers});
   }
 }

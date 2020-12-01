@@ -17,12 +17,15 @@ export class AppComponent {
 
   questionMarkURL = 'https://cdn.psychologytoday.com/sites/default/files/styles/amp_metadata_content_image_min_1200px_wide/public/field_blog_entry_teaser_image/2019-12/question_aisa-144x144-88_0-400_400.jpg?itok=LRzyp_qj';
 
+  levels = [1, 2, 3];
+  level = 1;
+
   constructor(private service: GuessWhoService) {
   }
 
   play(): void {
     this.loading = true;
-    this.service.getData().subscribe(
+    this.service.getData(this.level).subscribe(
       data => {
         this.loading = false;
         this.answer = false;

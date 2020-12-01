@@ -40,10 +40,13 @@ p.s. Отчет и исходный код .zip (или ссылку на github) также высылать на isu.ifmo
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import sys
-import requests
 import random
 from lxml import html
 import json
+import urllib.parse as urlparse
+from urllib.parse import parse_qs
+import requests
+
 
 IP = "127.0.0.1"
 PORT = 8080
@@ -65,19 +68,30 @@ def init_names() -> bool:
         return False
 
 
-def get_four_names() -> []:
+def parse_level_number(s: str) -> int:
+    if s == '1':
+        r = 10
+    elif s == '2':
+        r = 50
+    elif s == '3':
+        r = 99
+    return r
+
+
+def get_four_names(names_number: int) -> []:
     arr = []
     i = 1
+    LEVEL_NAMES = NAMES[0:names_number]
     while i < 5:
-        next_name = random.choice(NAMES)
+        next_name = random.choice(LEVEL_NAMES)
         if next_name not in arr:
             arr.append(next_name)
             i += 1
     return arr
 
 
-def google_search() -> {}:
-    names_arr = get_four_names()
+def google_search(names_number: int) -> {}:
+    names_arr = get_four_names(names_number)
     # todo: add parameter - search only face
     r = requests.get(f'https://www.google.com/search?tbm=isch&q={names_arr[0]} face')
     if r.status_code == 200:
@@ -102,7 +116,12 @@ class Server(BaseHTTPRequestHandler):
 
     def do_GET(self):
         self._set_headers()
-        r = google_search()
+        # read level
+        parsed = urlparse.urlparse(self.path)
+        level = parse_qs(parsed.query)['level'][0]
+        print(level)
+
+        r = google_search(parse_level_number(level))
         json_string = json.dumps(
             {'status': r.get('status'), 'text': r.get('text'), 'names': r.get('names'),
              'url': r.get('url'), 'correctName': r.get('correctName')})
